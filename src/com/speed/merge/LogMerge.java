@@ -9,7 +9,6 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ import java.util.TreeSet;
 public class LogMerge {
     private static final String[] MONTHS = new String[]{"Jan", "Feb", "Mar",
             "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-    private File logFolderParent;
+    private final File logFolderParent;
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(
             "y M d H:m:s");
     private long bytes;
@@ -36,7 +35,7 @@ public class LogMerge {
 
     private class MessageLine implements Comparable<MessageLine> {
         private Date date;
-        private String orig;
+        private final String orig;
 
         private MessageLine(final String line, final int year) {
             final String[] parts = line.split(" ", 4);
@@ -49,9 +48,7 @@ public class LogMerge {
                 }
             }
             final String day = parts[1];
-            final String date = new StringBuilder(Integer.toString(year))
-                    .append(' ').append(mon).append(' ').append(day)
-                    .append(' ').append(parts[2]).toString();
+            final String date = Integer.toString(year) + ' ' + mon + ' ' + day + ' ' + parts[2];
             try {
                 this.date = DATE_FORMAT.parse(date);
             } catch (ParseException e) {
@@ -143,7 +140,9 @@ public class LogMerge {
                     e.printStackTrace();
                 } finally {
                     try {
-                        read.close();
+                        if (read != null) {
+                            read.close();
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -166,7 +165,9 @@ public class LogMerge {
                 e.printStackTrace();
             } finally {
                 try {
-                    write.close();
+                    if (write != null) {
+                        write.close();
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
